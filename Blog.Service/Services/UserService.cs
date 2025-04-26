@@ -7,6 +7,7 @@ using Blog.Data.Entities;
 using Blog.Service.Contracts;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using ServiceStack;
 using StatusGeneric;
 
 namespace Blog.Service.Services;
@@ -24,7 +25,8 @@ public class UserService(IMapper mapper,
     private readonly IOtpService _otpService = otpService;
     private readonly IRedisService _redisService = redisService;
     private readonly IBaseRepository<Gender> _genderRepository = baseRepository2;
-    private const string Key = "user";
+    private const string userOfkey = "user";
+    private const string usersOfKey = "users";
     public Task<List<UserDto>> GetAllUsers()
     {
 
@@ -41,20 +43,18 @@ public class UserService(IMapper mapper,
         var user = await _userRepository.GetAll()
             .Where(u => u.PhoneNumber == phoneNumber)
             .FirstOrDefaultAsync();
-
         if (user is null)
             return false;
 
         else return true;
-
     }
 
-    private async Task<bool> UserExistInCache()
+    private async Task<bool> UserExistInCache(string phoneNumber)
     {
-        var user = await _redisService.GetAsync<User>(Key);
+        User? user = await _redisService.GetAsync<User>(userOfkey);
         if (user is null)
-            return false;
-        return true;
+            return false;   
+        return user.PhoneNumber == phoneNumber;
     }
 
     public Task Login(LoginModel model)
@@ -69,7 +69,7 @@ public class UserService(IMapper mapper,
 
     public async Task<int?> Register(RegisterModel model)
     {
-        if (await UserIsExistDb(model.PhoneNumber) || await UserExistInCache())
+        if (await UserIsExistDb(model.PhoneNumber) || await UserExistInCache(model.PhoneNumber))
         {
             AddError("User already exist");
             return null;
@@ -78,7 +78,7 @@ public class UserService(IMapper mapper,
         user.Gender = await GetGenderAsync(model.GenderId)
             ?? throw new ArgumentNullException("Enter valid Gender");
         user.PasswordHash = HashPassword(user, model.Password);
-        await _redisService.SetAsync(key: Key, user, TimeSpan.FromMinutes(5));
+        await _redisService.SetAsync(userOfkey, user, TimeSpan.FromMinutes(5));
         int code = _otpService.GenerateCode();
         await _redisService.SetAsync(user.PhoneNumber, code);
         return code;
@@ -89,9 +89,17 @@ public class UserService(IMapper mapper,
         throw new NotImplementedException();
     }
 
-    public Task VerifyRegister(OtpModel model)
+    public async Task VerifyRegister(OtpModel model)
     {
-        throw new NotImplementedException();
+        await _otpService.VerifyAsync(model);
+        var user = await _redisService.GetAsync<User>(userOfkey);
+        if(user is null)
+        {
+            AddError("Verification is failed, please register");
+            return;
+        }
+        await _userRepository.AddAsync(user);
+        await _userRepository.SaveChangesAsync();
     }
 
 

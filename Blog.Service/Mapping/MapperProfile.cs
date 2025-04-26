@@ -1,5 +1,6 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Blog.Common.Dtos;
+using Blog.Common.Models.Otp;
 using Blog.Common.Models.User;
 using Blog.Data.Entities;
 
@@ -11,6 +12,6 @@ public class MapperProfile : Profile
     {
         CreateMap<User, UserDto>();
         CreateMap<RegisterModel, User>();
-
+        CreateMap<OtpModel, Otp>();
     }
 }

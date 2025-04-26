@@ -22,4 +22,5 @@ public class BlogDbContext : DbContext
 
     public DbSet<PostStatus> PostStatuses { get; set; }
 
+    public DbSet<Otp> Otps { get; set; }
 }

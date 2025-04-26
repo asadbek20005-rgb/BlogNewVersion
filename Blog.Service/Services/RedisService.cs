@@ -1,4 +1,5 @@
 using Blog.Service.Contracts;
+using Newtonsoft.Json;
 using StackExchange.Redis;
 using System.Text.Json;
 using IDatabase = StackExchange.Redis.IDatabase;
@@ -18,9 +19,8 @@ public class RedisService(IConnectionMultiplexer connectionMultiplexer) : IRedis
             return default;
         }
 
-        var jsonValue = JsonSerializer.Deserialize<T>(value!);
+        var jsonValue = JsonConvert.DeserializeObject<T>(value!);
         return jsonValue;
-
     }
 
     public async Task SetAsync<T>(string key, T value, TimeSpan? expire = null)
@@ -34,7 +34,7 @@ public class RedisService(IConnectionMultiplexer connectionMultiplexer) : IRedis
             throw new ArgumentNullException(nameof(key));
         }
 
-        var jsonValue = JsonSerializer.Serialize(value);
+        var jsonValue = JsonConvert.SerializeObject(value);
         await _database.StringSetAsync(key, jsonValue);
     }
 }
