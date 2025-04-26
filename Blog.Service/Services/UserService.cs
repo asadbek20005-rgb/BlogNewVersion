@@ -14,19 +14,16 @@ namespace Blog.Service.Services;
 
 public class UserService(IMapper mapper,
     IBaseRepository<User> baseRepository,
-    IBaseRepository<Role> baseRepository1,
     IOtpService otpService,
     IRedisService redisService,
     IBaseRepository<Gender> baseRepository2) : StatusGenericHandler, IUserService
 {
     private readonly IMapper _mapper = mapper;
     private readonly IBaseRepository<User> _userRepository = baseRepository;
-    private readonly IBaseRepository<Role> _roleRepository = baseRepository1;
     private readonly IOtpService _otpService = otpService;
     private readonly IRedisService _redisService = redisService;
     private readonly IBaseRepository<Gender> _genderRepository = baseRepository2;
     private const string userOfkey = "user";
-    private const string usersOfKey = "users";
     public Task<List<UserDto>> GetAllUsers()
     {
 
@@ -53,7 +50,7 @@ public class UserService(IMapper mapper,
     {
         User? user = await _redisService.GetAsync<User>(userOfkey);
         if (user is null)
-            return false;   
+            return false;
         return user.PhoneNumber == phoneNumber;
     }
 
@@ -74,9 +71,14 @@ public class UserService(IMapper mapper,
             AddError("User already exist");
             return null;
         }
+        if (await GenderIsNotExistAsync(model.GenderId))
+        {
+            AddError("Enter valid gender");
+            return null;
+        }
+
         var user = _mapper.Map<User>(model);
-        user.Gender = await GetGenderAsync(model.GenderId)
-            ?? throw new ArgumentNullException("Enter valid Gender");
+        user.RoleId = 1;
         user.PasswordHash = HashPassword(user, model.Password);
         await _redisService.SetAsync(userOfkey, user, TimeSpan.FromMinutes(5));
         int code = _otpService.GenerateCode();
@@ -84,16 +86,11 @@ public class UserService(IMapper mapper,
         return code;
     }
 
-    public Task VerifyLogin(OtpModel model)
-    {
-        throw new NotImplementedException();
-    }
-
     public async Task VerifyRegister(OtpModel model)
     {
         await _otpService.VerifyAsync(model);
         var user = await _redisService.GetAsync<User>(userOfkey);
-        if(user is null)
+        if (user is null)
         {
             AddError("Verification is failed, please register");
             return;
@@ -101,8 +98,10 @@ public class UserService(IMapper mapper,
         await _userRepository.AddAsync(user);
         await _userRepository.SaveChangesAsync();
     }
-
-
+    public Task VerifyLogin(OtpModel model)
+    {
+        throw new NotImplementedException();
+    }
     private string HashPassword(User user, string password)
     {
         var passwordHasher = new PasswordHasher<User>().HashPassword(user, password);
@@ -110,19 +109,15 @@ public class UserService(IMapper mapper,
     }
 
 
-    private async Task<Gender?> GetGenderAsync(int genderId)
+    private async Task<bool> GenderIsNotExistAsync(int genderId)
     {
         var gender = await _genderRepository.GetAll()
             .Where(g => g.Id == genderId)
-            .FirstOrDefaultAsync();
-
-        if (gender is null)
-        {
-
-            return null;
-        }
-
-        return gender;
+            .AnyAsync(x => x.Id == genderId);
+        if (gender is false)
+            return true;
+        else
+            return false;
     }
 }
 
