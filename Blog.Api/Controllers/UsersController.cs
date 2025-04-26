@@ -1,0 +1,26 @@
+using Blog.Common.Models.User;
+using Blog.Service.Contracts;
+using Blog.Service.Extensions;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Blog.Api.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+public class UsersController(IUserService userService) : ControllerBase
+{
+    private readonly IUserService _userService = userService;
+    [HttpPost("account/register")]
+    public async Task<IActionResult> Register(RegisterModel model)
+    {
+        int? code = await _userService.Register(model);
+
+        if (_userService.IsValid)
+        {
+            return Ok(code);
+        }
+
+        _userService.CopyToModelState(ModelState);
+        return BadRequest(ModelState);
+    }
+}

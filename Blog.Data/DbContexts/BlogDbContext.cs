@@ -1,4 +1,4 @@
-﻿using Blog.Data.Entities;
+using Blog.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Blog.Data.DbContexts;

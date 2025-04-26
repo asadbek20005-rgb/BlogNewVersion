@@ -1,4 +1,4 @@
-﻿using Blog.Data.Contracts;
+using Blog.Data.Contracts;
 using Blog.Data.DbContexts;
 
 namespace Blog.Data.Repositories;
@@ -6,7 +6,7 @@ namespace Blog.Data.Repositories;
 public class BaseRepostiory<TEntity>(BlogDbContext blogDbContext) : IBaseRepository<TEntity> where TEntity : class
 {
     private readonly BlogDbContext _context = blogDbContext;
-    public async Task AddAsync(TEntity entity)
+    public virtual async Task AddAsync(TEntity entity)
     {
         await _context.Set<TEntity>().AddAsync(entity);
     }

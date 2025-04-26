@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Blog.Data.Entities;
@@ -23,6 +23,7 @@ public class User
     [Column("phone_number")]
     [StringLength(15)]
     [Required]
+    [Phone]
     public string PhoneNumber { get; set; } = string.Empty;
 
 
@@ -48,6 +49,20 @@ public class User
     [Column("updated_date")]
     [DataType(DataType.DateTime)]
     public DateTime UpdatedDate { get; set; }
+
+    [Column("gender_id")]
+    [Required]
+    public int GenderId { get; set; }
+
+    [ForeignKey(nameof(GenderId))]
+    public Gender Gender { get; set; }
+
+
+    [Column("role_id")]
+    public int RoleId { get; set; }
+
+    [ForeignKey(nameof(RoleId))]
+    public Role Role { get; set; }
 
 
     public ICollection<Blog>? Blogs { get; set; }

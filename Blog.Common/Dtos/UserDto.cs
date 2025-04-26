@@ -1,4 +1,4 @@
-﻿namespace Blog.Common.Dtos;
+namespace Blog.Common.Dtos;
 
 public class UserDto
 {

@@ -1,4 +1,4 @@
-﻿namespace Blog.Data.Contracts;
+namespace Blog.Data.Contracts;
 
 public interface IBaseRepository<TEntity> where TEntity : class
 {
