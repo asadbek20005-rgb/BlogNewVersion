@@ -6,6 +6,6 @@ namespace Blog.UI.Contracts;
 
 public interface IUserIntegration
 {
-    Task<HttpStatusCode> Register(RegisterModel model);
+    Task<Tuple<HttpStatusCode, string>> Register(RegisterModel model);
     Task<HttpStatusCode> VerifyRegister(OtpModel model);
 }

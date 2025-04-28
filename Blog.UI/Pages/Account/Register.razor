@@ -1,0 +1,116 @@
+@page "/account/register"
+@inherits PageCodeSources.RegisterPageCodeSource
+
+<div class="flex justify-center items-center min-h-screen bg-gray-100">
+    <div class="register-form">
+        <h1 class="register-title">Register</h1>
+
+        <EditForm Model="@Model" OnValidSubmit="Register">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="form-grid">
+                <InputText @bind-Value="Model.FirstName" class="input" placeholder="First Name" />
+                <InputText @bind-Value="Model.LastName" class="input" placeholder="Last Name" />
+                <InputText @bind-Value="Model.PhoneNumber" class="input" placeholder="Phone Number" />
+                <InputText @bind-Value="Model.Password" class="input" placeholder="Password" type="password" />
+                <InputText @bind-Value="Model.ConfirmPassword" class="input" placeholder="Confirm Password" type="password" />
+                <InputDate @bind-Value="Model.DateOfBirth" class="input" />
+
+                <InputSelect @bind-Value="Model.GenderId" class="input select-input">
+                    <option disabled selected value="">Select Gender</option>
+                    <option value="1">Male</option>
+                    <option value="2">Female</option>
+                </InputSelect>
+                <button type="submit" class="submit-button">
+                    Register
+                </button>
+
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+<style>
+    .register-form {
+        background-color: #ffffff;
+        padding: 2rem;
+        border-radius: 1.5rem;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 400px;
+        margin: auto;
+    }
+
+    .register-title {
+        font-size: 2rem;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 2rem;
+        color: #1f2937; /* Gray-800 */
+    }
+
+    .form-grid {
+        display: grid;
+        gap: 1.25rem;
+    }
+
+    .input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.75rem;
+        background-color: #f9fafb;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+        .input:focus {
+            background-color: #ffffff;
+            border-color: #2563eb; /* blue-600 */
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.25);
+            outline: none;
+        }
+
+    select.input option[disabled] {
+        color: #9ca3af; /* Gray-400 rang */
+    }
+
+    .select-input {
+        appearance: none;
+        background-image: url('data:image/svg+xml;utf8,<svg fill="none" stroke="%236B7280" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>');
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 1.5rem 1.5rem;
+        padding-right: 3rem;
+    }
+
+    .submit-button {
+        background-color: #2563eb;
+        color: white;
+        padding: 0.75rem;
+        font-size: 1rem;
+        font-weight: 600;
+        border: none;
+        border-radius: 0.75rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .submit-button:hover {
+            background-color: #1d4ed8; /* blue-700 */
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+        }
+
+        .submit-button:focus {
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.3);
+        }
+
+
+    .register-title {
+        font-size: 1.5rem;
+    }
+
+    
+</style>

@@ -15,7 +15,7 @@ public class RedisService(IConnectionMultiplexer connectionMultiplexer) : IRedis
     {
         var value = await _database.StringGetAsync(key);
         if (value.IsNullOrEmpty)
-        {
+        { 
             return default;
         }
 

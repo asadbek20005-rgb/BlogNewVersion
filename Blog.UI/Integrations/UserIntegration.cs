@@ -9,15 +9,17 @@ namespace Blog.UI.Integrations;
 public class UserIntegration(HttpClient httpClient) : IUserIntegration
 {
     private readonly HttpClient _httpClient = httpClient;
-    public async Task<HttpStatusCode> Register(RegisterModel model)
+    public async Task<Tuple<HttpStatusCode, string>> Register(RegisterModel model)
     {
         string url = "/api/Users/account/register";
         var response = await _httpClient.PostAsJsonAsync(url, model);
-        return response.StatusCode;
+        return new(response.StatusCode, await response.Content.ReadAsStringAsync());
     }
 
-    public Task<HttpStatusCode> VerifyRegister(OtpModel model)
+    public async Task<HttpStatusCode> VerifyRegister(OtpModel model)
     {
-        throw new NotImplementedException();
+        var url = "/api/Users/account/verify-register";
+        var response = await _httpClient.PostAsJsonAsync(url, model);
+        return response.StatusCode;
     }
 }

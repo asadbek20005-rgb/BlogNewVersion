@@ -26,8 +26,6 @@ public class RegisterModel
     [DataType(DataType.Text)]
     public string? Bio { get; set; }
 
-
-
     [DataType(DataType.Date)]
     [Required]
     public DateOnly DateOfBirth { get; set; }

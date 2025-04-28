@@ -1,0 +1,93 @@
+@page "/account/verify-register/{code}"
+
+@inherits PageCodeSources.VerifyRegisterPageCodeSource
+
+
+
+<EditForm Model="Model" OnValidSubmit="VerifyRegister"> 
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="container">
+        <h2>Enter Phone Number and Code</h2>
+            <div class="input-group">
+                <label for="phoneNumber">Phone Number:</label>
+                <input @bind-value="Model.PhoneNumber" type="tel" id="phoneNumber" name="phoneNumber" placeholder="+998 99 999 99 99" required>
+            </div>
+            <div class="input-group">
+                <label for="code">Code:</label>
+                <input @bind-value="Model.Code" type="number" id="code" name="code" placeholder="Enter Code" required>
+            </div>
+            <button type="submit" class="submit-btn">Send</button>
+    </div>
+
+</EditForm>
+
+<h1>Verification Code: @Code</h1>
+
+<style>
+    .container {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        width: 100%;
+        max-width: 400px;
+        text-align: center;
+    }
+
+    h2 {
+        margin-bottom: 20px;
+        font-size: 24px;
+        color: #444;
+    }
+
+    .form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .input-group {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    label {
+        font-size: 14px;
+        margin-bottom: 5px;
+        color: #555;
+    }
+
+    input {
+        padding: 10px;
+        width: 100%;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 16px;
+        outline: none;
+    }
+
+        input:focus {
+            border-color: #007bff;
+        }
+
+    .submit-btn {
+        padding: 12px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+        .submit-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .submit-btn:active {
+            background-color: #004085;
+        }
+</style>
