@@ -54,11 +54,36 @@ public class UserService(IMapper mapper,
         return user.PhoneNumber == phoneNumber;
     }
 
-    public Task Login(LoginModel model)
+    public async Task<int?> Login(LoginModel model)
     {
-        throw new NotImplementedException();
+        User? user = await GetUserIfExist(model.PhoneNumber);
+        if (user is null)
+        {
+            AddError("No such an account");
+            return null;
+        }
+
+        if(PasswordIsIncorrect(user, model.Password))
+        {
+            AddError("Password is incorrect");
+            return null;
+        }
+
+
+        var code = _otpService.GenerateCode();
+        await _redisService.SetAsync(user.PhoneNumber, code);
+        return code;
     }
 
+    private bool PasswordIsIncorrect(User user, string password)
+    {
+        var passwordVerificationResult = new PasswordHasher<User>().VerifyHashedPassword(user, user.PasswordHash, password);
+        if (passwordVerificationResult == PasswordVerificationResult.Failed)
+        {
+            return true;
+        }
+        return false;
+    }
     public Task Logout()
     {
         throw new NotImplementedException();
@@ -118,6 +143,18 @@ public class UserService(IMapper mapper,
             return true;
         else
             return false;
+    }
+
+    private async Task<User?> GetUserIfExist(string phoneNumber)
+    {
+        var user = await _userRepository.GetAll()
+            .Where(u => u.PhoneNumber == phoneNumber)
+            .FirstOrDefaultAsync();
+        if (user is null)
+        {
+            return null;
+        }
+        return user;
     }
 }
 

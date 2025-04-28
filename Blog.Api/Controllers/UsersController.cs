@@ -36,4 +36,17 @@ public class UsersController(IUserService userService) : ControllerBase
         _userService.CopyToModelState(ModelState);
         return BadRequest(ModelState);
     }
+
+
+    [HttpPost("account/login")]
+    public async Task<IActionResult> Login(LoginModel model)
+    {
+        int? code = await _userService.Login(model);
+        if (_userService.IsValid)
+        {
+            return Ok(code);
+        }
+        _userService.CopyToModelState(ModelState);
+        return BadRequest(ModelState);
+    }
 }
