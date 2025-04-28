@@ -9,6 +9,14 @@ namespace Blog.UI.Integrations;
 public class UserIntegration(HttpClient httpClient) : IUserIntegration
 {
     private readonly HttpClient _httpClient = httpClient;
+
+    public async Task<Tuple<HttpStatusCode, string>> Login(LoginModel model)
+    {
+        string url = "/api/Users/account/login";
+        var response = await _httpClient.PostAsJsonAsync(url, model);
+        return new(response.StatusCode, await response.Content.ReadAsStringAsync());
+    }
+
     public async Task<Tuple<HttpStatusCode, string>> Register(RegisterModel model)
     {
         string url = "/api/Users/account/register";
