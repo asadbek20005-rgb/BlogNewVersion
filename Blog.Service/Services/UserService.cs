@@ -16,13 +16,15 @@ public class UserService(IMapper mapper,
     IBaseRepository<User> baseRepository,
     IOtpService otpService,
     IRedisService redisService,
-    IBaseRepository<Gender> baseRepository2) : StatusGenericHandler, IUserService
+    IBaseRepository<Gender> baseRepository2,
+    IJwtService jwtService) : StatusGenericHandler, IUserService
 {
     private readonly IMapper _mapper = mapper;
     private readonly IBaseRepository<User> _userRepository = baseRepository;
     private readonly IOtpService _otpService = otpService;
     private readonly IRedisService _redisService = redisService;
     private readonly IBaseRepository<Gender> _genderRepository = baseRepository2;
+    private readonly IJwtService _jwtService = jwtService;
     private const string userOfkey = "user";
     public Task<List<UserDto>> GetAllUsers()
     {
@@ -72,6 +74,7 @@ public class UserService(IMapper mapper,
 
         var code = _otpService.GenerateCode();
         await _redisService.SetAsync(user.PhoneNumber, code);
+        await _redisService.SetAsync(userOfkey, user, TimeSpan.FromMinutes(5));
         return code;
     }
 
@@ -123,9 +126,19 @@ public class UserService(IMapper mapper,
         await _userRepository.AddAsync(user);
         await _userRepository.SaveChangesAsync();
     }
-    public Task VerifyLogin(OtpModel model)
+    public async Task<string> VerifyLogin(OtpModel model)
     {
-        throw new NotImplementedException();
+        await _otpService.VerifyAsync(model);
+        var user = await _redisService.GetAsync<User>(userOfkey);
+        if (user is null)
+        {
+            AddError("Verification is failed, please login");
+            return string.Empty;
+        }
+
+        string token = _jwtService.CreateToken(user);
+
+        return token;
     }
     private string HashPassword(User user, string password)
     {

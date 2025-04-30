@@ -1,32 +1,81 @@
+using Blog.Common.Models.Jwt;
 using Blog.Data.Contracts;
 using Blog.Data.DbContexts;
 using Blog.Data.Repositories;
 using Blog.Service.Contracts;
+using Blog.Service.Jwt;
 using Blog.Service.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
-
+var jwtSection = builder.Configuration.GetSection("JwtSettings").Get<JwtModel>()?? throw new ArgumentNullException();
 // Add services to the container.
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepostiory<>));
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IRedisService, RedisService>();
+builder.Services.AddScoped<IOtpService, OtpService>();
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
+builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect("localhost:6379,abortConnect=false,connectTimeout=20000,syncTimeout=20000,defaultDatabase=0"));
+
+
 builder.Services.AddDbContext<BlogDbContext>(options =>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
     AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 });
 
-builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect("localhost:6379,abortConnect=false,connectTimeout=20000,syncTimeout=20000,defaultDatabase=0"));
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    {
+        ValidIssuer = jwtSection.Issuer,
+        ValidAudience = jwtSection.Audience,
+        IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(jwtSection.Key)),
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+    };
+     
+});
 
-builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepostiory<>));
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IRedisService, RedisService>();
-builder.Services.AddScoped<IOtpService, OtpService>();
-builder.Services.AddAutoMapper(typeof(Program).Assembly);
+builder.Services.AddSwaggerGen(c =>
+{
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+    {
+        Description = "JWT Bearer. : \"Authorization: Bearer { token } \"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[]{}
+        }
+    });
+
+});
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAllOrigins",
@@ -37,7 +86,6 @@ builder.Services.AddCors(options =>
                 .AllowAnyHeader();
         });
 });
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();
 

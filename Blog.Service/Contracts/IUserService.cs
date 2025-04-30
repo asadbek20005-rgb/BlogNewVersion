@@ -10,7 +10,7 @@ public interface IUserService : IStatusGeneric
     Task<int?> Register(RegisterModel model);
     Task VerifyRegister(OtpModel model);
     Task<int?> Login(LoginModel model);
-    Task VerifyLogin(OtpModel model);
+    Task<string> VerifyLogin(OtpModel model);
     Task Logout();
     Task<bool> UserIsExistDb(string phoneNumber);
     Task<List<UserDto>> GetAllUsers();

@@ -49,4 +49,17 @@ public class UsersController(IUserService userService) : ControllerBase
         _userService.CopyToModelState(ModelState);
         return BadRequest(ModelState);
     }
+
+
+    [HttpPost("account/verify-login")]
+    public async Task<IActionResult> VerifyLogin(OtpModel model)
+    {
+        string token = await _userService.VerifyLogin(model);
+        if (_userService.IsValid)
+        {
+            return Ok(token);
+        }
+        _userService.CopyToModelState(ModelState);
+        return BadRequest(ModelState);
+    }
 }
