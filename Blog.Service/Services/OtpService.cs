@@ -13,19 +13,23 @@ public class OtpService(IBaseRepository<Otp> baseRepository,
 {
     private readonly IBaseRepository<Otp> _otpRepository = baseRepository;
     private readonly IRedisService _redisService = redisService;
-    private readonly IMapper _mapper = mapper;
     public async Task VerifyAsync(OtpModel model)
     {
         int? code = await _redisService.GetAsync<int>(model.PhoneNumber);
         if (!code.HasValue || code != model.Code)
         {
             throw new ArgumentException("Invalid phone number or code");
+
         }
 
         if (await CodeIsExpired(model.Code))
         {
             throw new ArgumentException("Code is expired");
+
         }
+        else
+        {
+
 
         var otp = new Otp
         {
@@ -36,6 +40,7 @@ public class OtpService(IBaseRepository<Otp> baseRepository,
         };
         await _otpRepository.AddAsync(otp);
         await _otpRepository.SaveChangesAsync();
+        }
     }
 
     public int GenerateCode()

@@ -1,3 +1,4 @@
+using Blog.Api.Filters;
 using Blog.Common.Models.Otp;
 using Blog.Common.Models.User;
 using Blog.Service.Contracts;
@@ -24,7 +25,7 @@ public class UsersController(IUserService userService) : ControllerBase
         _userService.CopyToModelState(ModelState);
         return BadRequest(ModelState);
     }
-
+    [ServiceFilter(typeof(OtpVerificationFilter))]
     [HttpPost("account/verify-register")]
     public async Task<IActionResult> VerifyRegister(OtpModel model)
     {
@@ -50,7 +51,7 @@ public class UsersController(IUserService userService) : ControllerBase
         return BadRequest(ModelState);
     }
 
-
+    [ServiceFilter(typeof(OtpVerificationFilter))]
     [HttpPost("account/verify-login")]
     public async Task<IActionResult> VerifyLogin(OtpModel model)
     {

@@ -1,3 +1,4 @@
+using Blog.Api.Filters;
 using Blog.Common.Models.Jwt;
 using Blog.Data.Contracts;
 using Blog.Data.DbContexts;
@@ -16,17 +17,17 @@ var jwtSection = builder.Configuration.GetSection("JwtSettings").Get<JwtModel>()
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepostiory<>));
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IRedisService, RedisService>();
-builder.Services.AddScoped<IOtpService, OtpService>();
-builder.Services.AddAutoMapper(typeof(Program).Assembly);
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddScoped<OtpVerificationFilter>();
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IOtpService, OtpService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
+builder.Services.AddScoped<IRedisService, RedisService>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepostiory<>));
 builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect("localhost:6379,abortConnect=false,connectTimeout=20000,syncTimeout=20000,defaultDatabase=0"));
-
 
 builder.Services.AddDbContext<BlogDbContext>(options =>
 {
