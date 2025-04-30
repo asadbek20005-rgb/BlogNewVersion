@@ -13,10 +13,10 @@ public class LoginPageCodeSource : ComponentBase
 
     public async Task Login()
     {
-        var result = await UserIntegration.Login(Model);
-        if (result.Item1 == System.Net.HttpStatusCode.OK)
+        var (statusCode, code) = await UserIntegration.Login(Model);
+        if (statusCode == System.Net.HttpStatusCode.OK)
         {
-            NavigationManager.NavigateTo("/");
+            NavigationManager.NavigateTo($"/account/verify-login/{code}");
         }
         else
         {

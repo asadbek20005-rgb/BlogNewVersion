@@ -16,10 +16,17 @@ public class UserIntegration(HttpClient httpClient) : IUserIntegration
         var response = await _httpClient.PostAsJsonAsync(url, model);
         return new(response.StatusCode, await response.Content.ReadAsStringAsync());
     }
-
+    
     public async Task<Tuple<HttpStatusCode, string>> Register(RegisterModel model)
     {
         string url = "/api/Users/account/register";
+        var response = await _httpClient.PostAsJsonAsync(url, model);
+        return new(response.StatusCode, await response.Content.ReadAsStringAsync());
+    }
+
+    public async Task<Tuple<HttpStatusCode, string>> VerifyLogin(OtpModel model)
+    {
+        string url = "/api/Users/account/verify-login";
         var response = await _httpClient.PostAsJsonAsync(url, model);
         return new(response.StatusCode, await response.Content.ReadAsStringAsync());
     }

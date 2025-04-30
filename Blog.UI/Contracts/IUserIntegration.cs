@@ -9,4 +9,5 @@ public interface IUserIntegration
     Task<Tuple<HttpStatusCode, string>> Register(RegisterModel model);
     Task<HttpStatusCode> VerifyRegister(OtpModel model);
     Task<Tuple<HttpStatusCode, string>> Login(LoginModel model);
+    Task<Tuple<HttpStatusCode,string>> VerifyLogin(OtpModel model);
 }
