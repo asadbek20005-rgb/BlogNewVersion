@@ -29,7 +29,7 @@ public class UsersController(IUserService userService) : ControllerBase
     [HttpPost("account/verify-register")]
     public async Task<IActionResult> VerifyRegister(OtpModel model)
     {
-        await _userService.VerifyRegister(model);
+        await _userService.VerifyRegister();
         if (_userService.IsValid)
         {
             return Ok("Done");
@@ -55,7 +55,7 @@ public class UsersController(IUserService userService) : ControllerBase
     [HttpPost("account/verify-login")]
     public async Task<IActionResult> VerifyLogin(OtpModel model)
     {
-        string token = await _userService.VerifyLogin(model);
+        string token = await _userService.VerifyLogin();
         if (_userService.IsValid)
         {
             return Ok(token);

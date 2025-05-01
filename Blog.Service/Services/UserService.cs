@@ -114,9 +114,8 @@ public class UserService(IMapper mapper,
         return code;
     }
 
-    public async Task VerifyRegister(OtpModel model)
+    public async Task VerifyRegister()
     {
-        await _otpService.VerifyAsync(model);
         var user = await _redisService.GetAsync<User>(userOfkey);
         if (user is null)
         {
@@ -126,9 +125,8 @@ public class UserService(IMapper mapper,
         await _userRepository.AddAsync(user);
         await _userRepository.SaveChangesAsync();
     }
-    public async Task<string> VerifyLogin(OtpModel model)
+    public async Task<string> VerifyLogin()
     {
-        await _otpService.VerifyAsync(model);
         var user = await _redisService.GetAsync<User>(userOfkey);
         if (user is null)
         {

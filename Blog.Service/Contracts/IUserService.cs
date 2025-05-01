@@ -8,9 +8,9 @@ namespace Blog.Service.Contracts;
 public interface IUserService : IStatusGeneric
 {
     Task<int?> Register(RegisterModel model);
-    Task VerifyRegister(OtpModel model);
+    Task VerifyRegister();
     Task<int?> Login(LoginModel model);
-    Task<string> VerifyLogin(OtpModel model);
+    Task<string> VerifyLogin();
     Task Logout();
     Task<bool> UserIsExistDb(string phoneNumber);
     Task<List<UserDto>> GetAllUsers();

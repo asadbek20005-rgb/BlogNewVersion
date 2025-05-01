@@ -2,7 +2,6 @@ using Blog.Common.Models.Otp;
 using Blog.Service.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-
 namespace Blog.Api.Filters;
 
 public class OtpVerificationFilter(IOtpService otpService) : IAsyncActionFilter
