@@ -4,6 +4,7 @@ using Blog.Data.Contracts;
 using Blog.Data.DbContexts;
 using Blog.Data.Repositories;
 using Blog.Service.Contracts;
+using Blog.Service.Helpers;
 using Blog.Service.Jwt;
 using Blog.Service.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -20,6 +21,7 @@ builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<ValidateModelFilter>();
+builder.Services.AddScoped<IUserHelper, UserHelper>();
 builder.Services.AddScoped<OtpVerificationFilter>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IOtpService, OtpService>();
@@ -88,6 +90,8 @@ builder.Services.AddCors(options =>
                 .AllowAnyHeader();
         });
 });
+
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 

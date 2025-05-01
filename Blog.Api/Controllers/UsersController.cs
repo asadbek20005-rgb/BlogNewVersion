@@ -3,15 +3,17 @@ using Blog.Common.Models.Otp;
 using Blog.Common.Models.User;
 using Blog.Service.Contracts;
 using Blog.Service.Extensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Blog.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class UsersController(IUserService userService) : ControllerBase
+public class UsersController(IUserService userService, IUserHelper userHelper) : ControllerBase
 {
     private readonly IUserService _userService = userService;
+    private readonly IUserHelper _userHelper = userHelper;
     [HttpPost("account/register")]
     public async Task<IActionResult> Register(RegisterModel model)
     {
@@ -59,6 +61,21 @@ public class UsersController(IUserService userService) : ControllerBase
         if (_userService.IsValid)
         {
             return Ok(token);
+        }
+        _userService.CopyToModelState(ModelState);
+        return BadRequest(ModelState);
+    }
+
+
+    [HttpGet("profile")]
+    [Authorize]
+    public async Task<IActionResult> GetProfile()
+    {
+        var id = _userHelper.GetUserId();
+        var user = await _userService.GetProfile(id);
+        if (_userService.IsValid)
+        {
+            return Ok(user);
         }
         _userService.CopyToModelState(ModelState);
         return BadRequest(ModelState);

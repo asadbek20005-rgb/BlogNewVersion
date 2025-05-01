@@ -14,6 +14,7 @@ public interface IUserService : IStatusGeneric
     Task Logout();
     Task<bool> UserIsExistDb(string phoneNumber);
     Task<List<UserDto>> GetAllUsers();
-    Task<UserDto> GetUserById(Guid id);
+    Task<UserDto?> GetProfile(Guid id);
+    Task UpdateBio(string bio);
 
 }

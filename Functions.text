@@ -1,6 +1,6 @@
-ï»¿ 1.Publish / Unpublish
+ 1.Publish / Unpublish
 Maqolani yozgan odam admin/moderator tasdiqlamasa, draft holatda turadi.
-Publish qilganda ommaga koâ€˜rsatiladi.
+Publish qilganda ommaga ko‘rsatiladi.
 
 2. Like / Dislike (Reactionlar)
 Har bir postga foydalanuvchi "like" yoki "dislike" bosishi mumkin.
@@ -8,19 +8,19 @@ Har bir postga foydalanuvchi "like" yoki "dislike" bosishi mumkin.
  3. Comments / Replies
 Foydalanuvchi postlarga izoh yozadi.
 
-Izohlarga javob (reply) qilish ham qoâ€˜shiladi (nested comments).
+Izohlarga javob (reply) qilish ham qo‘shiladi (nested comments).
 
 4. Search and Filter
-Sarlavha, tag, muallif, sana boâ€˜yicha qidirish.
+Sarlavha, tag, muallif, sana bo‘yicha qidirish.
 
 Masalan: ?search=aspnet, ?tag=blazor
 
 5. Categorization / Tagging
 Har bir post:
 
-Category ga tegishli boâ€˜ladi (masalan: Programming, Life, Business).
+Category ga tegishli bo‘ladi (masalan: Programming, Life, Business).
 
-Bir nechta Tag ga ega boâ€˜ladi (masalan: C#, ASP.NET, Blazor).
+Bir nechta Tag ga ega bo‘ladi (masalan: C#, ASP.NET, Blazor).
 
  6. Notification System
 Yangi post chiqqanda foydalanuvchilarga bildirishnoma boradi.
@@ -30,10 +30,10 @@ Yoki kimdir izoh yozsa, post egasiga xabar boradi.
 7. Views Count
 Har bir post ochilganda view count ortadi.
 
-Koâ€˜p oâ€˜qilgan maqolalarni alohida chiqarish mumkin.
+Ko‘p o‘qilgan maqolalarni alohida chiqarish mumkin.
 
  8. Bookmark / Save for Later
-Foydalanuvchi postni "saqlab qoâ€˜yish" (Read Later) uchun belgilaydi.
+Foydalanuvchi postni "saqlab qo‘yish" (Read Later) uchun belgilaydi.
 
  9. Share Functionality
 Har bir postni boshqa foydalanuvchilarga ulashish (telegram, email, link nusxalash).

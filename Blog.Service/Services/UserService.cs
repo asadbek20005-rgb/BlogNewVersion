@@ -1,6 +1,5 @@
 using AutoMapper;
 using Blog.Common.Dtos;
-using Blog.Common.Models.Otp;
 using Blog.Common.Models.User;
 using Blog.Data.Contracts;
 using Blog.Data.Entities;
@@ -26,15 +25,33 @@ public class UserService(IMapper mapper,
     private readonly IBaseRepository<Gender> _genderRepository = baseRepository2;
     private readonly IJwtService _jwtService = jwtService;
     private const string userOfkey = "user";
-    public Task<List<UserDto>> GetAllUsers()
+    public async Task<List<UserDto>> GetAllUsers()
     {
+        List<User>? users = await _redisService.GetAsync<List<User>>(userOfkey);
+        if (users is not null && users.Count == 0)
+        {
+            return _mapper.Map<List<UserDto>>(users);
+        }
 
-        throw new NotImplementedException();
+        users = await _userRepository.GetAll().ToListAsync();
+        return _mapper.Map<List<UserDto>>(users);
     }
 
-    public Task<UserDto> GetUserById(Guid id)
+    public async Task<UserDto?> GetProfile(Guid id)
     {
-        throw new NotImplementedException();
+        var user = await _userRepository.GetAll()
+            .Where(u => u.Id == id)
+            .FirstOrDefaultAsync();
+        if (user is null)
+        {
+            AddError("User not found");
+            return null;
+        }
+        else
+        {
+            var userDto = _mapper.Map<UserDto>(user);
+            return userDto;
+        }
     }
 
     public async Task<bool> UserIsExistDb(string phoneNumber)
@@ -65,7 +82,7 @@ public class UserService(IMapper mapper,
             return null;
         }
 
-        if(PasswordIsIncorrect(user, model.Password))
+        if (PasswordIsIncorrect(user, model.Password))
         {
             AddError("Password is incorrect");
             return null;
@@ -166,6 +183,11 @@ public class UserService(IMapper mapper,
             return null;
         }
         return user;
+    }
+
+    public Task UpdateBio(string bio)
+    {
+        throw new NotImplementedException();
     }
 }
 
