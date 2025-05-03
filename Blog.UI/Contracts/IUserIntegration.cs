@@ -1,3 +1,4 @@
+using Blog.Common.Dtos;
 using Blog.Common.Models.Otp;
 using Blog.Common.Models.User;
 using System.Net;
@@ -10,4 +11,5 @@ public interface IUserIntegration
     Task<HttpStatusCode> VerifyRegister(OtpModel model);
     Task<Tuple<HttpStatusCode, string>> Login(LoginModel model);
     Task<Tuple<HttpStatusCode,string>> VerifyLogin(OtpModel model);
+    Task<Tuple<HttpStatusCode, UserDto?>> GetProfile();
 }

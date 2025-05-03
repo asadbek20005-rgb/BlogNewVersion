@@ -1,3 +1,4 @@
+using Blazored.LocalStorage;
 using Blog.Common.Models.Otp;
 using Blog.UI.Contracts;
 using Microsoft.AspNetCore.Components;
@@ -8,6 +9,7 @@ public class VerifyLoginPageCodeSource : ComponentBase
 {
     [Inject] private IUserIntegration UserIntegration { get; set; }
     [Inject] private NavigationManager? NavigationManager { get; set; }
+    [Inject] private ILocalStorageService? LocalStorage { get; set; }
 
     public OtpModel Model { get; set; } = new();
     [Parameter] public string Code { get;set; }
@@ -16,6 +18,7 @@ public class VerifyLoginPageCodeSource : ComponentBase
         var (statusCode, token) = await UserIntegration.VerifyLogin(Model);
         if (statusCode == System.Net.HttpStatusCode.OK)
         {
+            await LocalStorage!.SetItemAsync("token", token);
             NavigationManager!.NavigateTo("/");
             return;
         }
