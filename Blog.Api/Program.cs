@@ -1,11 +1,16 @@
+using AutoMapper;
 using Blog.Api.Filters;
 using Blog.Common.Models.Jwt;
+using Blog.Common.Models.Minio;
 using Blog.Data.Contracts;
 using Blog.Data.DbContexts;
+using Blog.Data.Entities;
 using Blog.Data.Repositories;
 using Blog.Service.Contracts;
+using Blog.Service.Dependencies;
 using Blog.Service.Helpers;
 using Blog.Service.Jwt;
+using Blog.Service.Minio;
 using Blog.Service.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +18,7 @@ using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
-var jwtSection = builder.Configuration.GetSection("JwtSettings").Get<JwtModel>()?? throw new ArgumentNullException();
+var jwtSection = builder.Configuration.GetSection("JwtSettings").Get<JwtModel>() ?? throw new ArgumentNullException();
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -28,6 +33,7 @@ builder.Services.AddScoped<IOtpService, OtpService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 builder.Services.AddScoped<IRedisService, RedisService>();
+builder.Services.AddScoped<IContentService, ContentService>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepostiory<>));
 builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect("localhost:6379,abortConnect=false,connectTimeout=20000,syncTimeout=20000,defaultDatabase=0"));
@@ -50,7 +56,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
     };
-     
+
 });
 
 builder.Services.AddSwaggerGen(c =>
@@ -92,6 +98,26 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddScoped(provider =>
+{
+    var minioSettings = builder.Configuration.GetSection("MinioSettings").Get<MinioSettings>() ?? throw new ArgumentNullException();
+    var minioClient = new MinioService(minioSettings.Endpoint, minioSettings.AccessKey, minioSettings.SecretKey);
+    return minioClient;
+});
+
+builder.Services.AddScoped(provider =>
+    new ServiceDependencies(
+       provider.GetRequiredService<IMapper>(),
+       provider.GetRequiredService<IBaseRepository<User>>(),
+       provider.GetRequiredService<IOtpService>(),
+       provider.GetRequiredService<IRedisService>(),
+       provider.GetRequiredService<IBaseRepository<Gender>>(),
+       provider.GetRequiredService<IJwtService>(),
+       provider.GetRequiredService<IContentService>(),
+       provider.GetRequiredService<IMinioService>()
+       )
+);
 
 var app = builder.Build();
 

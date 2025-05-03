@@ -4,6 +4,8 @@ using Blog.Common.Models.User;
 using Blog.Data.Contracts;
 using Blog.Data.Entities;
 using Blog.Service.Contracts;
+using Blog.Service.Dependencies;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ServiceStack;
@@ -11,19 +13,15 @@ using StatusGeneric;
 
 namespace Blog.Service.Services;
 
-public class UserService(IMapper mapper,
-    IBaseRepository<User> baseRepository,
-    IOtpService otpService,
-    IRedisService redisService,
-    IBaseRepository<Gender> baseRepository2,
-    IJwtService jwtService) : StatusGenericHandler, IUserService
+public class UserService(ServiceDependencies dependencies) : StatusGenericHandler, IUserService
 {
-    private readonly IMapper _mapper = mapper;
-    private readonly IBaseRepository<User> _userRepository = baseRepository;
-    private readonly IOtpService _otpService = otpService;
-    private readonly IRedisService _redisService = redisService;
-    private readonly IBaseRepository<Gender> _genderRepository = baseRepository2;
-    private readonly IJwtService _jwtService = jwtService;
+    private readonly IMapper _mapper = dependencies.Mapper;
+    private readonly IBaseRepository<User> _userRepository = dependencies.UserRepository;
+    private readonly IOtpService _otpService = dependencies.OtpService;
+    private readonly IRedisService _redisService = dependencies.RedisService;
+    private readonly IBaseRepository<Gender> _genderRepository = dependencies.GenderRepository;
+    private readonly IJwtService _jwtService = dependencies.JwtService;
+    private readonly IContentService _contentService = dependencies.ContentService;
     private const string userOfkey = "user";
     public async Task<List<UserDto>> GetAllUsers()
     {
@@ -189,6 +187,34 @@ public class UserService(IMapper mapper,
     {
         throw new NotImplementedException();
     }
+
+    public async Task<string> UploadProfilePicture(Guid userId, IFormFile file)
+    {
+        var user = await _userRepository.GetAll()
+            .Where(u => u.Id == userId)
+            .FirstOrDefaultAsync();
+
+
+        if (user is null)
+        {
+            AddError("User not found");
+            return string.Empty;
+        }
+
+        var fileName = await _contentService.UploadFileAsync(file);
+        if (fileName is null)
+        {
+            AddError("File upload failed");
+            return string.Empty;
+        }
+        user.ImageUrl = fileName;
+        await _userRepository.UpdateAsync(user);
+        await _userRepository.SaveChangesAsync();
+
+        return fileName;
+    }
+
+
 }
 
 

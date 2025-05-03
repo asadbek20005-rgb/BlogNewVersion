@@ -1,6 +1,6 @@
 using Blog.Common.Dtos;
-using Blog.Common.Models.Otp;
 using Blog.Common.Models.User;
+using Microsoft.AspNetCore.Http;
 using StatusGeneric;
 
 namespace Blog.Service.Contracts;
@@ -16,5 +16,5 @@ public interface IUserService : IStatusGeneric
     Task<List<UserDto>> GetAllUsers();
     Task<UserDto?> GetProfile(Guid id);
     Task UpdateBio(string bio);
-
+    public Task<string> UploadProfilePicture(Guid userId, IFormFile file);
 }

@@ -80,4 +80,18 @@ public class UsersController(IUserService userService, IUserHelper userHelper) :
         _userService.CopyToModelState(ModelState);
         return BadRequest(ModelState);
     }
+
+    [HttpPost("profile/upload-picture")]
+    [Authorize]
+    public async Task<IActionResult> UploadProfilePicture(IFormFile file)
+    {
+        var id = _userHelper.GetUserId();
+        string path = await _userService.UploadProfilePicture(id, file);
+        if (_userService.IsValid)
+        {
+            return Ok(path);
+        }
+        _userService.CopyToModelState(ModelState);
+        return BadRequest(ModelState);
+    }
 }

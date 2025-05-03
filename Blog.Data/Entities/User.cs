@@ -37,6 +37,9 @@ public class User
     [DataType(DataType.Text)]
     public string? Bio { get; set; }
 
+    [Column("image_url")]
+    [DataType(DataType.ImageUrl)]
+    public string? ImageUrl { get; set; }
 
     [Column("date_of_birth")]
     [DataType(DataType.Date)]
