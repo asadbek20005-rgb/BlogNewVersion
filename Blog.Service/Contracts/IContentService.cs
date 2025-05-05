@@ -4,7 +4,7 @@ namespace Blog.Service.Contracts;
 
 public interface IContentService
 {
-    Task<string> UploadFileAsync(IFormFile file);
-
+    Task<string> UploadFileAsync(Guid userId,IFormFile file);
+    Task<Stream> DownloadFileAsync(string fileName);
 
 }

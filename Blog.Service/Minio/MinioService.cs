@@ -10,7 +10,7 @@ public class MinioService : IMinioService
 {
     private readonly MinioClient _minioClient;
     private string minioUrl = "http://localhost:9000";
-    private const string buckeName = "blog-bucket";
+    private const string buckeName = "my-bucket2";
     public MinioService(string endpoint, string accessKey, string secretKey)
     {
         _minioClient = (MinioClient)new MinioClient()

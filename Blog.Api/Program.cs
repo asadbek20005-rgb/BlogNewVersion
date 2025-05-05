@@ -114,10 +114,31 @@ builder.Services.AddScoped(provider =>
        provider.GetRequiredService<IRedisService>(),
        provider.GetRequiredService<IBaseRepository<Gender>>(),
        provider.GetRequiredService<IJwtService>(),
-       provider.GetRequiredService<IContentService>(),
-       provider.GetRequiredService<IMinioService>()
+       provider.GetRequiredService<Lazy<IContentService>>(),
+       provider.GetRequiredService<IMinioService>(),
+       provider.GetRequiredService<IBaseRepository<Content>>()
        )
 );
+
+builder.Services.AddScoped<Lazy<IContentService>>(provider =>
+{
+    return new Lazy<IContentService>(() =>
+    {
+        var dependencies = provider.GetRequiredService<ServiceDependencies>();
+        return new ContentService(dependencies);
+    });
+});
+
+
+builder.Services.AddScoped<IMinioService>(provider =>
+{
+    var settings = builder.Configuration.GetSection("MinIO").Get<MinioSettings>();
+    if (settings is null)
+    {
+        throw new ArgumentNullException(nameof(settings), "MinIO settings are not configured.");
+    }
+    return new MinioService(settings.Endpoint, settings.AccessKey, settings.SecretKey);
+});
 
 var app = builder.Build();
 

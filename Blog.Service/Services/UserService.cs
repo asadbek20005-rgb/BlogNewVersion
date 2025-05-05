@@ -21,7 +21,7 @@ public class UserService(ServiceDependencies dependencies) : StatusGenericHandle
     private readonly IRedisService _redisService = dependencies.RedisService;
     private readonly IBaseRepository<Gender> _genderRepository = dependencies.GenderRepository;
     private readonly IJwtService _jwtService = dependencies.JwtService;
-    private readonly IContentService _contentService = dependencies.ContentService;
+    private readonly Lazy<IContentService> _contentService = dependencies.ContentService;
     private const string userOfkey = "user";
     public async Task<List<UserDto>> GetAllUsers()
     {
@@ -201,7 +201,7 @@ public class UserService(ServiceDependencies dependencies) : StatusGenericHandle
             return string.Empty;
         }
 
-        var fileName = await _contentService.UploadFileAsync(file);
+        var fileName = await _contentService.Value.UploadFileAsync(user.Id,file);
         if (fileName is null)
         {
             AddError("File upload failed");

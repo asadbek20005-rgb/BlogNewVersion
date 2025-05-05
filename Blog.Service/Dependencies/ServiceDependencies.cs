@@ -12,6 +12,7 @@ public record ServiceDependencies(
     IRedisService RedisService,
     IBaseRepository<Gender> GenderRepository,
     IJwtService JwtService,
-    IContentService ContentService,
-    IMinioService MinioService
+    Lazy<IContentService> ContentService,
+    IMinioService MinioService,
+    IBaseRepository<Content> ContentRepository
 );
