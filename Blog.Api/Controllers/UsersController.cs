@@ -94,4 +94,17 @@ public class UsersController(IUserService userService, IUserHelper userHelper) :
         _userService.CopyToModelState(ModelState);
         return BadRequest(ModelState);
     }
+
+    [HttpGet("profile/download-picture")]
+    [Authorize]
+    public async Task<IActionResult> DownloadProfilePicture(string fileName)
+    {
+        Guid userId = _userHelper.GetUserId();
+        var file = await _userService.DownloadFileAsync(userId, fileName);
+        if (_userService.IsValid)
+            return Ok(file);
+
+        _userService.CopyToModelState(ModelState);
+        return BadRequest(ModelState);
+    }
 }

@@ -69,4 +69,5 @@ public class User
 
 
     public ICollection<Blog>? Blogs { get; set; }
+    public ICollection<Content>? Contents { get; set; }
 }

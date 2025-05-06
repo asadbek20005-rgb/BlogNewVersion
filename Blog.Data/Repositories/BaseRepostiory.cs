@@ -22,7 +22,7 @@ public class BaseRepostiory<TEntity>(BlogDbContext blogDbContext) : IBaseReposit
         return _context.Set<TEntity>().AsQueryable();
     }
 
-    public async Task<TEntity?> GetByIdAsync(int id)
+    public async Task<TEntity?> GetByIdAsync<TId>(TId id)
     {
         return await _context.Set<TEntity>().FindAsync(id);
     }

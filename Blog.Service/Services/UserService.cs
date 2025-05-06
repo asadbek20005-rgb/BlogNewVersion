@@ -73,7 +73,7 @@ public class UserService(ServiceDependencies dependencies) : StatusGenericHandle
 
     public async Task<int?> Login(LoginModel model)
     {
-        User? user = await GetUserIfExist(model.PhoneNumber);
+        User? user = await GetUserByPhoneNumberAsync(model.PhoneNumber);
         if (user is null)
         {
             AddError("No such an account");
@@ -171,7 +171,7 @@ public class UserService(ServiceDependencies dependencies) : StatusGenericHandle
             return false;
     }
 
-    private async Task<User?> GetUserIfExist(string phoneNumber)
+    private async Task<User?> GetUserByPhoneNumberAsync(string phoneNumber)
     {
         var user = await _userRepository.GetAll()
             .Where(u => u.PhoneNumber == phoneNumber)
@@ -201,7 +201,7 @@ public class UserService(ServiceDependencies dependencies) : StatusGenericHandle
             return string.Empty;
         }
 
-        var fileName = await _contentService.Value.UploadFileAsync(user.Id,file);
+        var fileName = await _contentService.Value.UploadFileAsync(user.Id, file);
         if (fileName is null)
         {
             AddError("File upload failed");
@@ -214,7 +214,19 @@ public class UserService(ServiceDependencies dependencies) : StatusGenericHandle
         return fileName;
     }
 
-
+    public async Task<Stream> DownloadFileAsync(Guid userId, string fileName)
+    {
+        var user = await _userRepository
+            .GetAll()
+            .AnyAsync(x => x.Id == userId);
+        if (user is false)
+        {
+            AddError("User not exist");
+            return Stream.Null;
+        }
+        var fileStream = await _contentService.Value.DownloadFileAsync(userId, fileName);
+        return fileStream;
+    }
 }
 
 

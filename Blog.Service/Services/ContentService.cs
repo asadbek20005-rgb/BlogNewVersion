@@ -2,6 +2,7 @@ using Blog.Data.Contracts;
 using Blog.Data.Entities;
 using Blog.Service.Contracts;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 
 namespace Blog.Service.Services;
 
@@ -9,10 +10,19 @@ public class ContentService(Dependencies.ServiceDependencies dependencies) : ICo
 {
     private readonly IMinioService _minioService = dependencies.MinioService;
     private readonly IBaseRepository<Content> _contentRepsitory = dependencies.ContentRepository;
-
-    public Task<Stream> DownloadFileAsync(string fileName)
+    public async Task<Stream> DownloadFileAsync(Guid userId, string fileName)
     {
-        throw new NotImplementedException();
+        bool fileNameIsAppropriateToUser = await _contentRepsitory
+            .GetAll()
+            .AnyAsync(x => x.UserId == userId && x.FileUrl == fileName);
+        if (fileNameIsAppropriateToUser)
+        {
+            var file = await _minioService.GetFileAsync(fileName);
+            return file;
+
+        }
+
+        return Stream.Null;
     }
 
     public async Task<string> UploadFileAsync(Guid userId, IFormFile file)
