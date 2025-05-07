@@ -33,4 +33,9 @@ public class RegisterModel
     [Required]
     public int GenderId { get; set; }
 
+
+    [StringLength(255)]
+    [EmailAddress]
+    public string Email { get; set; } = string.Empty;
+
 }

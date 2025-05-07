@@ -18,4 +18,5 @@ public interface IUserService : IStatusGeneric
     Task UpdateBio(string bio);
     public Task<string> UploadProfilePicture(Guid userId, IFormFile file);
     public Task<Stream> DownloadFileAsync(Guid userId, string fileName);
+    public Task UpdateProfileAsync(Guid userId,UpdateProfileModel model);
 }

@@ -15,7 +15,7 @@ public class UsersController(IUserService userService, IUserHelper userHelper) :
     private readonly IUserService _userService = userService;
     private readonly IUserHelper _userHelper = userHelper;
     [HttpPost("account/register")]
-    public async Task<IActionResult> Register(RegisterModel model)
+    public async Task<IActionResult> Register([FromBody] RegisterModel model)
     {
         int? code = await _userService.Register(model);
 
@@ -29,7 +29,7 @@ public class UsersController(IUserService userService, IUserHelper userHelper) :
     }
     [ServiceFilter(typeof(OtpVerificationFilter))]
     [HttpPost("account/verify-register")]
-    public async Task<IActionResult> VerifyRegister(OtpModel model)
+    public async Task<IActionResult> VerifyRegister([FromBody] OtpModel model)
     {
         await _userService.VerifyRegister();
         if (_userService.IsValid)
@@ -42,7 +42,7 @@ public class UsersController(IUserService userService, IUserHelper userHelper) :
 
 
     [HttpPost("account/login")]
-    public async Task<IActionResult> Login(LoginModel model)
+    public async Task<IActionResult> Login([FromBody] LoginModel model)
     {
         int? code = await _userService.Login(model);
         if (_userService.IsValid)
@@ -55,7 +55,7 @@ public class UsersController(IUserService userService, IUserHelper userHelper) :
 
     [ServiceFilter(typeof(OtpVerificationFilter))]
     [HttpPost("account/verify-login")]
-    public async Task<IActionResult> VerifyLogin(OtpModel model)
+    public async Task<IActionResult> VerifyLogin([FromBody]OtpModel model)
     {
         string token = await _userService.VerifyLogin();
         if (_userService.IsValid)
@@ -97,12 +97,28 @@ public class UsersController(IUserService userService, IUserHelper userHelper) :
 
     [HttpGet("profile/download-picture")]
     [Authorize]
-    public async Task<IActionResult> DownloadProfilePicture(string fileName)
+    public async Task<IActionResult> DownloadProfilePicture([FromQuery]string fileName)
     {
         Guid userId = _userHelper.GetUserId();
         var file = await _userService.DownloadFileAsync(userId, fileName);
         if (_userService.IsValid)
             return Ok(file);
+
+        _userService.CopyToModelState(ModelState);
+        return BadRequest(ModelState);
+    }
+
+
+    [HttpPut("profile")]
+    [Authorize]
+    public async Task<IActionResult> UpdateProfile([FromBody]UpdateProfileModel model)
+    {
+        Guid userId = _userHelper.GetUserId();
+        await _userService.UpdateProfileAsync(userId, model);
+        if (_userService.IsValid)
+        {
+            return Ok("done");
+        }
 
         _userService.CopyToModelState(ModelState);
         return BadRequest(ModelState);

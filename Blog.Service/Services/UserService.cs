@@ -227,6 +227,18 @@ public class UserService(ServiceDependencies dependencies) : StatusGenericHandle
         var fileStream = await _contentService.Value.DownloadFileAsync(userId, fileName);
         return fileStream;
     }
+
+    public async Task UpdateProfileAsync(Guid userId, UpdateProfileModel model)
+    {
+        User? user = await _userRepository.GetByIdAsync(userId);
+        if (user is null)
+        {
+            AddError("No such account");
+            return;
+        }
+
+        var updatedModel = _mapper.Map(model,user);
+        await _userRepository.UpdateAsync(updatedModel);
+        await _userRepository.SaveChangesAsync();
+    }
 }
-
-

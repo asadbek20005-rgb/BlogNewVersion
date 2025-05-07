@@ -44,6 +44,7 @@ builder.Services.AddDbContext<BlogDbContext>(options =>
     AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 });
 
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
     options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters

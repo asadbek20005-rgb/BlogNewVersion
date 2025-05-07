@@ -1,7 +1,17 @@
-﻿<Router AppAssembly="@typeof(App).Assembly">
-    <Found Context="routeData">
-        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
-        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+@using Microsoft.AspNetCore.Components.Authorization
+@inject NavigationManager NavigationManager
+<CascadingAuthenticationState>
+
+    <Router AppAssembly="@typeof(App).Assembly">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                <Authorizing>
+                    <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+                </Authorizing>
+                <NotAuthorized>
+                    <Blog.UI.Pages.RedirectToLogin/>
+              </NotAuthorized>
+            </AuthorizeRouteView>
     </Found>
     <NotFound>
         <PageTitle>Not found</PageTitle>
@@ -10,3 +20,5 @@
         </LayoutView>
     </NotFound>
 </Router>
+
+</CascadingAuthenticationState>

@@ -33,6 +33,11 @@ public class User
     public string PasswordHash { get; set; } = string.Empty;
 
 
+    [Column("email")]
+    [StringLength(255)]
+    [EmailAddress]
+    public string Email { get; set; } = string.Empty;
+
     [Column("bio")]
     [DataType(DataType.Text)]
     public string? Bio { get; set; }

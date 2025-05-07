@@ -12,7 +12,7 @@ public class VerifyLoginPageCodeSource : ComponentBase
     [Inject] private ILocalStorageService? LocalStorage { get; set; }
 
     public OtpModel Model { get; set; } = new();
-    [Parameter] public string Code { get;set; }
+    [Parameter] public string Code { get; set; }
     public async Task VerifyLogin()
     {
         var (statusCode, token) = await UserIntegration.VerifyLogin(Model);

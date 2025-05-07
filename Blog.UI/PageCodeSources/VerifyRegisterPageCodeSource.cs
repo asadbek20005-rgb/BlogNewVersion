@@ -20,7 +20,7 @@ public class VerifyRegisterPageCodeSource : ComponentBase
         var status = await UserIntegration.VerifyRegister(Model);
         if (status == System.Net.HttpStatusCode.OK)
         {
-            NavigationManager.NavigateTo("/");
+            NavigationManager.NavigateTo("/account/login");
         }
         else
         {
